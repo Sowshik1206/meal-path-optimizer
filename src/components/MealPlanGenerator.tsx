@@ -7,15 +7,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Download, RefreshCw, Clock, Users, ChefHat } from "lucide-react";
 import NutritionCalculator from "@/components/NutritionCalculator";
 
-const MealPlanGenerator = ({ clientData, onBack }) => {
+// Define types for meal plan structure
+interface Meal {
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  prepTime: number;
+  ingredients: string[];
+  instructions: string;
+}
+
+interface DayMeals {
+  breakfast: Meal;
+  lunch: Meal;
+  dinner: Meal;
+  [key: string]: Meal; // Allow for additional meals like snacks
+}
+
+interface MealPlan {
+  [day: string]: DayMeals;
+}
+
+const MealPlanGenerator = ({ clientData, onBack }: { clientData: any; onBack: () => void }) => {
   const [currentWeek, setCurrentWeek] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   
   const nutritionNeeds = NutritionCalculator.calculateDailyNeeds(clientData);
   const mealDistribution = NutritionCalculator.calculateMealDistribution(nutritionNeeds.calories, clientData.mealsPerDay || "3");
 
-  // Mock meal plan data
-  const mealPlan = {
+  // Mock meal plan data with proper typing
+  const mealPlan: MealPlan = {
     monday: {
       breakfast: {
         name: "Protein Oatmeal with Berries",
@@ -207,7 +230,7 @@ const MealPlanGenerator = ({ clientData, onBack }) => {
                       <CardTitle className="flex items-center justify-between">
                         <span>{day}</span>
                         <Badge variant="outline">
-                          {Object.values(dayMeals).reduce((total, meal) => total + (meal.calories || 0), 0)} cal
+                          {Object.values(dayMeals).reduce((total, meal) => total + meal.calories, 0)} cal
                         </Badge>
                       </CardTitle>
                     </CardHeader>
